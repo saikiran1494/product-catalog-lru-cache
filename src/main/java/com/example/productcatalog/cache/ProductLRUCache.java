@@ -1,7 +1,7 @@
 package com.example.productcatalog.cache;
 
 import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import com.example.productcatalog.entity.Product;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class ProductLRUCache {
 	{
 		this.capacity = 3;
 		
-		cacheMap = new HashMap<>();
+		cacheMap = new ConcurrentHashMap<>();
 		
 		head = new ProductNode(null,null);
 		tail = new ProductNode(null,null);
@@ -46,7 +46,7 @@ public class ProductLRUCache {
 		nextNode.prev = prevNode;
 	}
 	
-	public Product getProduct(Long productId)
+	public synchronized Product getProduct(Long productId)
 	{
 		if(!cacheMap.containsKey(productId))
 			return null;
@@ -60,7 +60,7 @@ public class ProductLRUCache {
 		return node.product;
 	}
 	
-	public void putProduct(Long productId,
+	public synchronized void putProduct(Long productId,
 			               Product product)
 	{
 		if (cacheMap.containsKey(productId))
@@ -85,7 +85,7 @@ public class ProductLRUCache {
 		}
 	}
 	
-	public void removeProduct(Long productId)
+	public synchronized void removeProduct(Long productId)
 	{
 		if(!cacheMap.containsKey(productId))
 			return;
